@@ -19,10 +19,12 @@ Baltboard brings Lithuanian characters, English QWERTY, clean Day/Night themes, 
 ## See it in action
 
 <p align="center">
-  <img src="assets/screenshots/settings.png" alt="Baltboard settings with grouped appearance and typing controls" width="280">
+  <img src="assets/screenshots/keyboard.png" alt="Baltboard Lithuanian QWERTY keyboard with its dedicated Lithuanian character row" width="200">
+  <img src="assets/screenshots/emoji.png" alt="Baltboard checkbox settings for visible emoji categories" width="200">
+  <img src="assets/screenshots/settings.png" alt="Baltboard settings with grouped appearance and typing controls" width="200">
 </p>
 
-Real settings screenshot from the installed **2.0.34** version. The 2.0.35 release adds reviewed reliability fixes.
+Real keyboard, emoji-category settings and main settings screenshots from the installed **2.0.34** version. The keyboard screenshot uses a local demonstration page, not a private conversation. The 2.0.35 release adds reviewed reliability fixes.
 
 ## What makes it useful
 
