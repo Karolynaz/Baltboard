@@ -2,7 +2,7 @@
 
 Moderni lietuvių ir anglų klaviatūra Android telefonui, sukurta remiantis [AnySoftKeyboard](https://github.com/AnySoftKeyboard/AnySoftKeyboard).
 
-[Atsisiųsti APK](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.35/Baltboard-v2.0.35.apk) · [Leidimai](https://github.com/Karolynaz/Baltboard/releases) · [English](../README.md)
+[Atsisiųsti APK](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.36/Baltboard-v2.0.36.apk) · [Leidimai](https://github.com/Karolynaz/Baltboard/releases) · [English](../README.md)
 
 ## Galimybės
 
@@ -23,7 +23,7 @@ Nuostatų kalba priklauso nuo **Android sistemos kalbos**, ne nuo to, ar šiuo m
 
 Reikia **Android 6.0 arba naujesnės versijos**.
 
-1. Atsisiųskite `Baltboard-v2.0.35.apk` ir atidarykite telefone.
+1. Atsisiųskite `Baltboard-v2.0.36.apk` ir atidarykite telefone.
 2. Jei Android paprašo, leiskite naršyklei arba failų tvarkyklei įdiegti programą. Vėliau šį leidimą galite išjungti.
 3. Atidarykite Baltboard ir skiltyje **Informacija → Klaviatūros įjungimas** sekite instrukciją.
 4. Pasirinkite Baltboard kaip aktyvią klaviatūrą.
@@ -41,7 +41,7 @@ Tikrinamas ar verčiamas tekstas siunčiamas pasirinktam tiekėjui tik paleidus 
 
 ## Šaltinis ir klaidų pranešimai
 
-Visas šios versijos kodas pridėtas prie leidimo kaip [Baltboard-v2.0.35-source.zip](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.35/Baltboard-v2.0.35-source.zip). Kol kas pagrindinėje GitHub šakoje pateikiamas pristatymas; viso šaltinio įkėlimui dar reikia sutvarkyti vietinio Git prisijungimo teises. Automatiškai sugeneruoti GitHub „Source code“ archyvai nėra pilnas programos šaltinis.
+Visas šios versijos kodas pridėtas prie leidimo kaip [Baltboard-v2.0.36-source.zip](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.36/Baltboard-v2.0.36-source.zip). Kol kas pagrindinėje GitHub šakoje pateikiamas pristatymas; viso šaltinio įkėlimui dar reikia sutvarkyti vietinio Git prisijungimo teises. Automatiškai sugeneruoti GitHub „Source code“ archyvai nėra pilnas programos šaltinis.
 
 Klaidas aprašykite [Issues](https://github.com/Karolynaz/Baltboard/issues): telefono modelis, Android ir Baltboard versijos, programėlė bei atkūrimo žingsniai. Neskelbkite API raktų ar asmeninių tekstų.
 
