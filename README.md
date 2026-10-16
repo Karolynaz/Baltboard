@@ -5,7 +5,7 @@
 <h1 align="center">Baltboard</h1>
 <p align="center">A modern Lithuanian &amp; English keyboard for Android.<br>Comfortable typing. Your words. Optional AI assistance.</p>
 <p align="center">
-  <a href="https://github.com/Karolynaz/Baltboard/releases/download/v2.0.35/Baltboard-v2.0.35.apk"><strong>Download APK</strong></a>
+  <a href="https://github.com/Karolynaz/Baltboard/releases/download/v2.0.36/Baltboard-v2.0.36.apk"><strong>Download APK</strong></a>
   &nbsp;·&nbsp;
   <a href="https://github.com/Karolynaz/Baltboard/releases">Release notes</a>
   &nbsp;·&nbsp;
@@ -14,7 +14,7 @@
 
 Baltboard brings Lithuanian characters, English QWERTY, clean Day/Night themes, clipboard history and emoji into one keyboard. It is a customized version of [AnySoftKeyboard](https://github.com/AnySoftKeyboard/AnySoftKeyboard), with optional AI rewriting and natural translation into English.
 
-> **Testing release:** Android 6.0+ · Package: `lt.klaviatura.advanced` · Current APK: **2.0.35**. This is a sideloaded test build, not a Google Play production release.
+> **Testing release:** Android 6.0+ · Package: `lt.klaviatura.advanced` · Current APK: **2.0.36**. This is a sideloaded test build, not a Google Play production release.
 
 ## See it in action
 
@@ -24,7 +24,7 @@ Baltboard brings Lithuanian characters, English QWERTY, clean Day/Night themes, 
   <img src="assets/screenshots/settings.png" alt="Baltboard settings with grouped appearance and typing controls" width="200">
 </p>
 
-Real keyboard, emoji-category settings and main settings screenshots from the installed **2.0.34** version. The keyboard screenshot uses a local demonstration page, not a private conversation. The 2.0.35 release adds reviewed reliability fixes.
+Real keyboard, emoji-category settings and main settings screenshots from the installed **2.0.34** version. The keyboard screenshot uses a local demonstration page, not a private conversation. The 2.0.36 release fixes duplicated word suffixes when editing existing text.
 
 ## What makes it useful
 
@@ -42,7 +42,7 @@ Real keyboard, emoji-category settings and main settings screenshots from the in
 
 ## Install on your phone
 
-1. Download [**Baltboard-v2.0.35.apk**](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.35/Baltboard-v2.0.35.apk) on your Android phone.
+1. Download [**Baltboard-v2.0.36.apk**](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.36/Baltboard-v2.0.36.apk) on your Android phone.
 2. Open it. If Android asks, allow installation from the browser or file manager you used. You can turn that permission off again afterward.
 3. Install and open **Baltboard**.
 4. Follow **Information → Enable keyboard** to enable it and select it as your current keyboard.
@@ -68,7 +68,7 @@ Read [Privacy & troubleshooting](docs/PRIVACY-AND-HELP.md) before enabling netwo
 
 ## Source code and development
 
-The complete source for this build is [**Baltboard-v2.0.35-source.zip**](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.35/Baltboard-v2.0.35-source.zip).
+The complete source for this build is [**Baltboard-v2.0.36-source.zip**](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.36/Baltboard-v2.0.36-source.zip).
 
 **For now, `main` contains the project presentation, not the full application source.** The original Git upload was rejected by the local GitHub credential. Download the specifically named source asset above—not GitHub's automatically generated “Source code” archives.
 
@@ -82,7 +82,7 @@ Extract the snapshot and follow its build instructions. Android code uses Gradle
 
 The APK is generated at `ime/app/build/outputs/apk/personal/app-personal.apk`.
 
-For **2.0.35**, 125 selected Android unit tests passed and one was skipped. The APK was assembled and its signature verified. This is targeted regression coverage, not a guarantee of compatibility with every phone or editor.
+For **2.0.36**, 109 selected Android unit tests passed, including 9 new word-editing regression tests; 5 existing tests were skipped. The APK was assembled and its signature verified. This is targeted regression coverage, not a guarantee of compatibility with every phone or editor.
 
 ## Report a problem
 
