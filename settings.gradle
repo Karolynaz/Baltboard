@@ -1,0 +1,25 @@
+rootProject.name = 'AdvancedLTKeyboard'
+
+include ':api'
+
+include ':junit-sharding'
+
+include ':addons:base'
+include ':addons:languages'
+include ':addons:languages:english', ':addons:languages:english:pack'
+include ':addons:languages:lithuanian:pack'
+
+include ':ime'
+include ':ime:base', ':ime:base-rx', ':ime:base-test', ':ime:prefs'
+include ':ime:notification'
+include ':ime:remote', ':ime:fileprovider'
+include ':ime:addons'
+include ':ime:dictionaries', ':ime:dictionaries:jnidictionaryv1', ':ime:dictionaries:jnidictionaryv2', ':ime:nextword'
+include ':ime:pixel', ':ime:overlay'
+include ':ime:gesturetyping'
+include ':ime:voiceime'
+include ':ime:releaseinfo'
+include ':ime:chewbacca'
+include ':ime:permissions'
+
+include ':ime:app'

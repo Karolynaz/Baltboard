@@ -1,0 +1,13 @@
+<resources>
+    <item name="advanced_lt_settings_root" type="id" />
+    <item name="advanced_lt_settings_detail" type="id" />
+    <item name="advanced_lt_power_saving" type="id" />
+    <item name="advanced_lt_wider_key_spacing" type="id" />
+    <item name="advanced_lt_fold_continuous" type="id" />
+    <item name="advanced_lt_fold_split" type="id" />
+    <item name="advanced_lt_theme_steve_light" type="id" />
+    <item name="advanced_lt_theme_steve_dark" type="id" />
+    <item name="advanced_lt_glass" type="id" />
+    <item type="id" name="advanced_lt_theme_auto" />
+    <item type="id" name="advanced_lt_floating_backspace" />
+</resources>

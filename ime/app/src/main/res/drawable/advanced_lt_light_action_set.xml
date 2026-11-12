@@ -1,0 +1,6 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ask="http://schemas.android.com/apk/res-auto">
+    <item ask:action_search="true" android:drawable="@drawable/advanced_lt_light_search" />
+    <item ask:action_done="true" android:drawable="@drawable/advanced_lt_light_done" />
+    <item android:drawable="@drawable/advanced_lt_light_enter" />
+</selector>

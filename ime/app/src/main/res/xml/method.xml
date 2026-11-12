@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+/**
+ * Copyright (c) 2008, The Android Open Source Project
+ * Copyright (c) 2013 Menny Even-Danan
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License. 
+ * You may obtain a copy of the License at 
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0 
+ *
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
+-->
+
+<input-method xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:isDefault="false"
+    android:settingsActivity="lt.klaviatura.advanced.AdvancedLtSettingsActivity"
+    android:supportsInlineSuggestions="true"
+    android:supportsSwitchingToNextInputMethod="true"
+    tools:targetApi="r">
+    <subtype
+        android:icon="@drawable/ic_status_english"
+        android:subtypeId="1912895432"
+        android:imeSubtypeLocale="en"
+        android:imeSubtypeExtraValue="@string/settings_default_keyboard_id"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:name="@string/english_keyboard"
+        android:label="@string/balticboard_subtype_english"
+        android:overridesImplicitlyEnabledSubtype="true" />
+    <subtype
+        android:subtypeId="2117531031"
+        android:imeSubtypeLocale="lt"
+        android:imeSubtypeExtraValue="aace6147-5687-4ac4-26a6-011d507d90ff"
+        android:imeSubtypeMode="keyboard"
+        android:isAsciiCapable="true"
+        android:label="@string/balticboard_subtype_lithuanian"
+        android:overridesImplicitlyEnabledSubtype="true" />
+</input-method>

@@ -1,0 +1,21 @@
+<resources>
+    <string name="advanced_lt_toolbar_ai">Rašyba ir gramatika</string>
+    <string name="advanced_lt_toolbar_translate">Vertimas į anglų kalbą</string>
+    <string name="advanced_lt_toolbar_emoji">Jaustukai</string>
+    <string name="advanced_lt_toolbar_clipboard">Iškarpinė</string>
+    <string name="advanced_lt_toolbar_dismiss_paste">Slėpti įklijavimo pasiūlymą</string>
+    <string name="advanced_lt_toolbar_settings">Nustatymai</string>
+    <string name="advanced_lt_quick_settings">Spartieji nustatymai</string>
+    <string name="advanced_lt_quick_split_keyboard">Padalyta klaviatūra plačiame horizontaliame lange</string>
+    <string name="advanced_lt_suggestions_back">Slėpti šio žodžio siūlymus</string>
+    <string name="advanced_lt_suggestions_more">Rodyti visus siūlymus</string>
+    <string name="advanced_lt_clipboard_back_to_keyboard">Grįžti į klaviatūrą</string>
+    <string name="advanced_lt_clipboard_choose_to_delete">Pasirinkti iškarpas trynimui</string>
+    <string name="advanced_lt_clipboard_cancel_selection">Baigti pasirinkimą</string>
+    <string name="advanced_lt_clipboard_all">Visi</string>
+    <string name="advanced_lt_clipboard_delete">Trinti</string>
+    <string name="advanced_lt_clipboard_cancel">Atšaukti</string>
+    <string name="advanced_lt_clipboard_empty">Iškarpinė tuščia</string>
+    <string name="advanced_lt_clipboard_delete_confirmation">Trinti %1$d elementą?</string>
+    <string name="advanced_lt_clipboard_delete_confirmation_plural">Trinti %1$d elementus?</string>
+</resources>

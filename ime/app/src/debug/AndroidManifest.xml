@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- The installable personal build uses the normal application: no developer watermark or
+    Logcat provider, even though it is signed with the local debug key for easy USB installation. -->
+    <application
+        android:name="com.menny.android.anysoftkeyboard.AnyApplication"
+        tools:replace="android:name" />
+</manifest>

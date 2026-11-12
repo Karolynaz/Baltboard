@@ -1,0 +1,4 @@
+<resources>
+    <color name="advanced_lt_pressed_color">@android:color/system_accent1_600</color>
+    <color name="advanced_lt_pressed_light_color">@android:color/system_accent1_200</color>
+</resources>

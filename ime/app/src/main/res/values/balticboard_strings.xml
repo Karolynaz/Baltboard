@@ -1,0 +1,5 @@
+<resources>
+    <color name="balticboard_red">#E0000B</color>
+    <string name="balticboard_subtype_english">English</string>
+    <string name="balticboard_subtype_lithuanian">Lithuanian</string>
+</resources>

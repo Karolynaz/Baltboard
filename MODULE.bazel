@@ -1,0 +1,125 @@
+"Declare dependencies for bzlmod, see https://bazel.build/build/bzlmod"
+
+# We declare all of the direct dependencies of all of the code in this
+# workspace. A single version of each of these is declared, implying that all of
+# the code will use the same version of all of these tools and libraries listed.
+# For bzlmod dependencies, this implements the "single version policy".
+
+bazel_dep(name = "bazel_lib", version = "3.5.0")
+bazel_dep(name = "rules_nodejs", version = "6.7.4")
+bazel_dep(name = "aspect_rules_js", version = "3.0.3")
+bazel_dep(name = "aspect_rules_ts", version = "3.9.2")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "aspect_rules_esbuild", version = "0.26.0")
+bazel_dep(name = "rules_multitool", version = "1.3.0")
+bazel_dep(name = "rules_java", version = "9.3.0")
+bazel_dep(name = "rules_android", version = "0.7.3")
+bazel_dep(name = "contrib_rules_jvm", version = "0.32.0")
+bazel_dep(name = "rules_jvm_external", version = "6.10")
+
+multitool = use_extension("@rules_multitool//multitool:extension.bzl", "multitool")
+multitool.hub(lockfile = "//tools:multitool.lock.json")
+use_repo(multitool, "multitool")
+
+register_toolchains("@multitool//toolchains:all")
+
+#########################
+# JavaScript and TypeScript
+# https://github.com/aspect-build/rules_js/tree/main/e2e/bzlmod
+# https://github.com/aspect-build/rules_ts/tree/main/e2e/bzlmod
+
+# In keeping with the single version policy, in this example, the NPM ecosystem
+# dependencies are specified at the top level rather than in each sub-project.
+# However, it is possible to have multiple different sets of NPM dependencies
+# across a workspace.
+
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node.toolchain(
+    name = "nodejs",
+    node_version_from_nvmrc = "//:.nvmrc",
+)
+use_repo(
+    node,
+    "nodejs_toolchains",
+)
+
+pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
+
+# Allows developers to get a local node_modules tree, using
+# bazel run -- @pnpm//:pnpm --dir $PWD install
+use_repo(pnpm, "pnpm")
+
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "npm",
+    npmrc = "//:.npmrc",
+    pnpm_lock = "//:pnpm-lock.yaml",
+)
+use_repo(npm, "npm")
+
+rules_ts_ext = use_extension(
+    "@aspect_rules_ts//ts:extensions.bzl",
+    "ext",
+)
+rules_ts_ext.deps(
+    ts_integrity = "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+    # This keeps the TypeScript version in-sync with the editor, which is typically best.
+    ts_version_from = "//:package.json",
+)
+use_repo(rules_ts_ext, "npm_typescript")
+
+bazel_dep(name = "aspect_rules_lint", version = "1.13.0")
+bazel_dep(name = "buildifier_prebuilt", version = "8.2.1.2")
+# This is for formatting and linting
+# bazel_dep(name = "toolchains_llvm", version = "1.1.2")
+
+# llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
+# llvm.toolchain(
+#     llvm_versions = {
+#         "": "16.0.0",
+#         "darwin-x86_64": "15.0.7",
+#     },
+# )
+# use_repo(llvm, "llvm_toolchain", "llvm_toolchain_llvm")
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    name = "maven",
+    artifacts = [
+        "org.junit.jupiter:junit-jupiter-api:5.8.2",
+        "org.junit.jupiter:junit-jupiter-engine:5.8.2",
+        "org.junit.platform:junit-platform-launcher:1.8.2",
+        "org.junit.platform:junit-platform-reporting:1.8.2",
+    ],
+    fetch_sources = True,
+    known_contributing_modules = ["protobuf"],
+    lock_file = "//:maven_install.json",
+)
+use_repo(
+    maven,
+    "maven",
+)
+
+http_jar = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_jar(
+    name = "google-java-format",
+    sha256 = "25157797a0a972c2290b5bc71530c4f7ad646458025e3484412a6e5a9b8c9aa6",
+    url = "https://github.com/google/google-java-format/releases/download/v1.25.2/google-java-format-1.25.2-all-deps.jar",
+)
+
+http_jar(
+    name = "ktfmt",
+    integrity = "sha256-dtBcYU/hhkeIVXFw/olBD3UTSGap+EAR+b1XDKElJrE=",
+    url = "https://repo1.maven.org/maven2/com/facebook/ktfmt/0.53/ktfmt-0.53-jar-with-dependencies.jar",
+)
+
+http_archive(
+    name = "crowdin_cli",
+    build_file_content = "exports_files(['crowdin-cli.jar'])",
+    sha256 = "5df38198c91b8b75eb8d105f0eb27ceb2d7e06e24872f849d6d50b403b060aa1",
+    strip_prefix = "4.14.2",
+    url = "https://github.com/crowdin/crowdin-cli/releases/download/4.14.2/crowdin-cli.zip",
+)

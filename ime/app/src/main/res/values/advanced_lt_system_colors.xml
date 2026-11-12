@@ -1,0 +1,5 @@
+<resources>
+    <color name="advanced_lt_pressed_color">#675080</color>
+    <color name="advanced_lt_pressed_light_color">#DDC6F4</color>
+    <string name="advanced_lt_toolbar_undo">Undo</string>
+</resources>

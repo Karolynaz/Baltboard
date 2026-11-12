@@ -1,0 +1,2 @@
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@drawable/yochees_dark_shift_on" android:tint="@color/advanced_lt_pressed_light_color" />

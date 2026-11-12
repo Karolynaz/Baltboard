@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="steve_light_theme" translatable="false">Steve Light</string>
+    <string name="steve_dark_theme" translatable="false">Steve Dark</string>
+    <color name="steve_light_surface">#D5D9E1</color>
+    <color name="steve_dark_surface">#383E4A</color>
+    <color name="steve_light_key">#F8FAFD</color>
+    <color name="steve_dark_key">#666F81</color>
+    <style name="SteveLightTheme" parent="YocheesLightTheme">
+        <item name="android:background">@color/steve_light_surface</item>
+        <item name="suggestionBackgroundImage">@color/steve_light_surface</item>
+        <item name="keyBackground">@drawable/steve_light_key</item>
+        <item name="suggestionNormalTextColor">#252B36</item>
+        <item name="suggestionOthersTextColor">#454C5C</item>
+    </style>
+    <style name="SteveDarkTheme" parent="YocheesDarkTheme">
+        <item name="android:background">@color/steve_dark_surface</item>
+        <item name="suggestionBackgroundImage">@color/steve_dark_surface</item>
+        <item name="keyBackground">@drawable/steve_dark_key</item>
+        <item name="keyboardNameTextColor">#F5F7FB</item>
+        <item name="suggestionNormalTextColor">#F5F7FB</item>
+        <item name="suggestionOthersTextColor">#D8DEE9</item>
+    </style>
+</resources>

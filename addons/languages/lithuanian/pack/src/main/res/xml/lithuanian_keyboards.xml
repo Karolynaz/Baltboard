@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Keyboards>
+    <Keyboard
+        nameResId="@string/lithuanian_qwerty_4rows"
+        iconResId="@drawable/ic_status_lithuanian"
+        layoutResId="@xml/lithuanian_qwerty_4rows"
+        landscapeResId="@xml/lithuanian_qwerty_4rows"
+        id="aace6147-5687-4ac4-26a6-011d507d90ff"
+        description="@string/lithuanian_qwerty_4rows_description"
+        index="2"
+        defaultEnabled="true"
+        physicalKeyboardMappingResId="@xml/lithuanian_qwerty_physical"
+        defaultDictionaryLocale="lt" />
+</Keyboards>
+
