@@ -110,7 +110,7 @@ public class AdvancedLtSettingsActivityTest {
 
   @Test
   @Config(qualifiers = "lt")
-  public void themeScreenOffersOriginalAndSteveThemesWithOptionalGlass() {
+  public void themeScreenOffersThreeModesAndOptionalIosStyle() {
     try (ActivityController<AdvancedLtSettingsActivity> controller =
         Robolectric.buildActivity(AdvancedLtSettingsActivity.class).setup()) {
       final AdvancedLtSettingsActivity activity = controller.get();
@@ -120,12 +120,13 @@ public class AdvancedLtSettingsActivityTest {
       final RadioButton gray = activity.findViewById(R.id.advanced_lt_theme_gray);
       final RadioButton white = activity.findViewById(R.id.advanced_lt_theme_white);
       Assert.assertNull(black);
-      Assert.assertEquals(5, ((android.widget.RadioGroup) gray.getParent()).getChildCount());
+      Assert.assertEquals(3, ((android.widget.RadioGroup) gray.getParent()).getChildCount());
       Assert.assertEquals("Night", gray.getText().toString());
       Assert.assertEquals("Day", white.getText().toString());
       Assert.assertEquals("Auto", ((RadioButton) activity.findViewById(R.id.advanced_lt_theme_auto)).getText().toString());
 
-      activity.findViewById(R.id.advanced_lt_theme_steve_light).performClick();
+      white.performClick();
+      ((SwitchCompat) activity.findViewById(R.id.advanced_lt_ios_style)).setChecked(true);
       Assert.assertEquals(
           AdvancedLtTheme.STEVE_LIGHT,
           AnyApplication.getKeyboardThemeFactory(activity).getEnabledAddOn().getId());
@@ -134,7 +135,7 @@ public class AdvancedLtSettingsActivityTest {
       glass.setChecked(true);
       activity.getOnBackPressedDispatcher().onBackPressed();
       activity.findViewById(R.id.advanced_lt_settings_themes).performClick();
-      Assert.assertTrue(((RadioButton) activity.findViewById(R.id.advanced_lt_theme_steve_light)).isChecked());
+      Assert.assertTrue(((SwitchCompat) activity.findViewById(R.id.advanced_lt_ios_style)).isChecked());
       Assert.assertTrue(((SwitchCompat) activity.findViewById(R.id.advanced_lt_glass)).isChecked());
     }
   }
@@ -253,7 +254,7 @@ public class AdvancedLtSettingsActivityTest {
       activity.findViewById(R.id.advanced_lt_settings_themes).performClick();
       Assert.assertFalse(appearance.isActivated());
       Assert.assertTrue(activity.findViewById(R.id.advanced_lt_settings_themes).isActivated());
-      Assert.assertNotNull(activity.findViewById(R.id.advanced_lt_theme_steve_light));
+      Assert.assertNotNull(activity.findViewById(R.id.advanced_lt_ios_style));
     }
   }
 

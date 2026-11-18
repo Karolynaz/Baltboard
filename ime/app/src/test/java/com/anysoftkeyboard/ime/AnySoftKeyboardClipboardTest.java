@@ -703,7 +703,7 @@ public class AnySoftKeyboardClipboardTest extends AnySoftKeyboardBaseTest {
 
     latestAlertDialog = GeneralDialogTestUtil.getLatestShownDialog();
     Assert.assertNotNull(latestAlertDialog);
-    Assert.assertEquals(20, latestAlertDialog.getListView().getAdapter().getCount());
+    Assert.assertEquals(25, latestAlertDialog.getListView().getAdapter().getCount());
     Assert.assertEquals(
         "text 99", latestAlertDialog.getListView().getAdapter().getItem(0).toString());
     Assert.assertEquals(
@@ -712,6 +712,21 @@ public class AnySoftKeyboardClipboardTest extends AnySoftKeyboardBaseTest {
         "text 97", latestAlertDialog.getListView().getAdapter().getItem(2).toString());
     Assert.assertEquals(
         "text 96", latestAlertDialog.getListView().getAdapter().getItem(3).toString());
+  }
+
+  @Test
+  public void favoriteOutsideRecentHistorySurvivesUntilUnpinned() {
+    for (int index = 0; index < 25; index++) {
+      mClipboardManager.setPrimaryClip(ClipData.newPlainText("", "clip " + index));
+    }
+    Assert.assertTrue(mAnySoftKeyboardUnderTest.toggleClipboardFavorite(24));
+    mClipboardManager.setPrimaryClip(ClipData.newPlainText("", "new clip"));
+    Assert.assertEquals(26, mAnySoftKeyboardUnderTest.getClipboardHistoryEntries().size());
+    Assert.assertEquals("clip 0", mAnySoftKeyboardUnderTest.getClipboardHistoryEntries().get(25));
+    Assert.assertFalse(mAnySoftKeyboardUnderTest.toggleClipboardFavorite(25));
+    mClipboardManager.setPrimaryClip(ClipData.newPlainText("", "another clip"));
+    Assert.assertEquals(25, mAnySoftKeyboardUnderTest.getClipboardHistoryEntries().size());
+    Assert.assertFalse(mAnySoftKeyboardUnderTest.getClipboardHistoryEntries().contains("clip 0"));
   }
 
   @Test

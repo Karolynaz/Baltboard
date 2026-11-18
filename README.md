@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="assets/screenshots/baltboard-icon.png" alt="Baltboard icon: a white rider and horse inside a phone on a red gradient" width="112">
+  <img src="assets/screenshots/baltboard-icon.png" alt="Baltboard icon: a white Ą key on a pink gradient" width="112">
 </p>
 
 <h1 align="center">Baltboard</h1>
 <p align="center">A modern Lithuanian &amp; English keyboard for Android.<br>Comfortable typing. Your words. Optional AI assistance.</p>
 <p align="center">
-  <a href="https://github.com/Karolynaz/Baltboard/releases/download/v2.0.46/Baltboard-v2.0.46.apk"><strong>Download APK</strong></a>
+  <a href="https://github.com/Karolynaz/Baltboard/releases/download/v2.0.54/Baltboard-v2.0.54.apk"><strong>Download APK</strong></a>
   &nbsp;·&nbsp;
   <a href="https://github.com/Karolynaz/Baltboard/releases">Release notes</a>
   &nbsp;·&nbsp;
@@ -14,7 +14,7 @@
 
 Baltboard brings Lithuanian characters, English QWERTY, clean Day/Night themes, clipboard history and emoji into one keyboard. It is a customized version of [AnySoftKeyboard](https://github.com/AnySoftKeyboard/AnySoftKeyboard), with optional AI rewriting and natural translation into English.
 
-> **Testing release:** Android 6.0+ · Package: `lt.klaviatura.advanced` · Current APK: **2.0.46**. This is a sideloaded test build, not a Google Play production release.
+> **Testing release:** Android 6.0+ · Package: `lt.klaviatura.advanced` · Current APK: **2.0.54**. This is a sideloaded test build, not a Google Play production release.
 
 ## See it in action
 
@@ -32,7 +32,7 @@ Real keyboard, emoji-category settings and main settings screenshots from the in
 - **Quick language switching:** swipe across the spacebar; the keyboard remembers your last language.
 - **Day, Night or Auto:** a light or dark keyboard, with Auto following Android's dark-mode setting.
 - **Suggestions and correction:** configurable word suggestions, dictionaries, autocorrect and swipe typing.
-- **Clipboard history:** up to 20 text entries in a two-column grid. Copying the same text moves it to the top rather than keeping duplicates. Select entries to delete them.
+- **Clipboard history:** 25 recent entries in a two-column grid. Long-press an entry to bookmark it and keep it beyond the history limit. Copying the same text moves it to the top rather than keeping duplicates. Select entries to delete them.
 - **Recent-copy shortcut:** a temporary paste preview in the toolbar, with an X to dismiss it.
 - **Emoji without interruption:** categories and recents; choosing an emoji keeps the picker open by default. Returning to the keyboard after selection is optional.
 - **Optional AI rewrite:** spelling, grammar and more natural wording, with editable instructions.
@@ -42,7 +42,7 @@ Real keyboard, emoji-category settings and main settings screenshots from the in
 
 ## Install on your phone
 
-1. Download [**Baltboard-v2.0.46.apk**](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.46/Baltboard-v2.0.46.apk) on your Android phone.
+1. Download [**Baltboard-v2.0.54.apk**](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.54/Baltboard-v2.0.54.apk) on your Android phone.
 2. Open it. If Android asks, allow installation from the browser or file manager you used. You can turn that permission off again afterward.
 3. Install and open **Baltboard**.
 4. Follow **Information → Enable keyboard** to enable it and select it as your current keyboard.
@@ -68,7 +68,7 @@ Read [Privacy & troubleshooting](docs/PRIVACY-AND-HELP.md) before enabling netwo
 
 ## Source code and development
 
-The source for this build is available in the [v2.0.46 tag](https://github.com/Karolynaz/Baltboard/tree/v2.0.46). Android code uses Gradle. Some upstream tools use Bazel.
+The source for this build is available in the [v2.0.54 tag](https://github.com/Karolynaz/Baltboard/tree/v2.0.54). Android code uses Gradle. Some upstream tools use Bazel.
 
 ```sh
 # With JDK 21 and the required Android SDK installed:
@@ -78,7 +78,7 @@ The source for this build is available in the [v2.0.46 tag](https://github.com/K
 
 The APK is generated at `ime/app/build/outputs/apk/personal/app-personal.apk`.
 
-For **2.0.46**, 121 selected Android unit tests passed and 0 were skipped. The APK was also installed on a Galaxy Fold and the wider emoji layout was checked on-device.
+For **2.0.54**, 137 selected Android unit tests passed and 1 was skipped.
 
 ## Report a problem
 

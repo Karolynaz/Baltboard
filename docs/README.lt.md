@@ -2,7 +2,7 @@
 
 Moderni lietuvių ir anglų klaviatūra Android telefonui, sukurta remiantis [AnySoftKeyboard](https://github.com/AnySoftKeyboard/AnySoftKeyboard).
 
-[Atsisiųsti APK](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.46/Baltboard-v2.0.46.apk) · [Leidimai](https://github.com/Karolynaz/Baltboard/releases) · [English](../README.md)
+[Atsisiųsti APK](https://github.com/Karolynaz/Baltboard/releases/download/v2.0.54/Baltboard-v2.0.54.apk) · [Leidimai](https://github.com/Karolynaz/Baltboard/releases) · [English](../README.md)
 
 ## Galimybės
 
@@ -11,7 +11,7 @@ Moderni lietuvių ir anglų klaviatūra Android telefonui, sukurta remiantis [An
 - Kalbos keitimas braukiant per tarpo klavišą ir paskutinės kalbos įsiminimas.
 - Day, Night ir Auto temos. Auto atsižvelgia į Android tamsų režimą.
 - Reguliuojami žodžių siūlymai, automatinis taisymas ir rašymas braukiant.
-- Iki 20 tekstų iškarpinėje, du stulpeliai ir pasirinktinai trinami įrašai. Pakartotinai nukopijuotas tekstas perkeliamas į priekį.
+- Iškarpinėje telpa 25 naujausi įrašai. Palaikykite įrašą nuspaustą, kad pažymėtumėte jį ir išsaugotumėte ilgesniam laikui. Pakartotinai nukopijuotas tekstas perkeliamas į priekį.
 - Laikinas ką tik nukopijuoto teksto pasiūlymas su uždarymo mygtuku.
 - Emoji kategorijos ir paskutiniai naudoti emoji; pasirinkus emoji nebūtina grįžti į raidžių klaviatūrą.
 - Pasirenkamas AI teksto taisymas ir prasminis vertimas į anglų kalbą.
@@ -23,7 +23,7 @@ Nuostatų kalba priklauso nuo **Android sistemos kalbos**, ne nuo to, ar šiuo m
 
 Reikia **Android 6.0 arba naujesnės versijos**.
 
-1. Atsisiųskite `Baltboard-v2.0.46.apk` ir atidarykite telefone.
+1. Atsisiųskite `Baltboard-v2.0.54.apk` ir atidarykite telefone.
 2. Jei Android paprašo, leiskite naršyklei arba failų tvarkyklei įdiegti programą. Vėliau šį leidimą galite išjungti.
 3. Atidarykite Baltboard ir skiltyje **Informacija → Klaviatūros įjungimas** sekite instrukciją.
 4. Pasirinkite Baltboard kaip aktyvią klaviatūrą.
@@ -41,7 +41,7 @@ Tikrinamas ar verčiamas tekstas siunčiamas pasirinktam tiekėjui tik paleidus 
 
 ## Šaltinis ir klaidų pranešimai
 
-Šios versijos kodą rasite [v2.0.46 žymoje](https://github.com/Karolynaz/Baltboard/tree/v2.0.46).
+Šios versijos kodą rasite [v2.0.54 žymoje](https://github.com/Karolynaz/Baltboard/tree/v2.0.54).
 
 Klaidas aprašykite [Issues](https://github.com/Karolynaz/Baltboard/issues): telefono modelis, Android ir Baltboard versijos, programėlė bei atkūrimo žingsniai. Neskelbkite API raktų ar asmeninių tekstų.
 

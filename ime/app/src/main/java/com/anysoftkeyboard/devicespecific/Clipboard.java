@@ -33,6 +33,10 @@ public interface Clipboard {
 
   boolean isOsClipboardEmpty();
 
+  boolean isFavorite(int entryIndex);
+
+  boolean toggleFavorite(int entryIndex);
+
   void deleteEntry(int entryIndex);
 
   void deleteAllEntries();

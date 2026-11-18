@@ -1,2 +1,2 @@
-<inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:inset="12dp" android:drawable="@drawable/balticboard_icon" />
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@drawable/baltboard_adaptive" android:gravity="fill" />

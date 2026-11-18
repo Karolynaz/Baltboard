@@ -23,7 +23,7 @@ public final class AdvancedLtRewriteView extends LinearLayout implements MainChi
     this.close = close;
     lt = "lt".equals(getResources().getConfiguration().locale.getLanguage());
     setOrientation(VERTICAL);
-    setBackgroundColor(AdvancedLtTheme.surface(context));
+    setBackgroundColor(AdvancedLtTheme.panelSurface(context));
     LinearLayout toolbar = new LinearLayout(context);
     toolbar.setGravity(Gravity.CENTER_VERTICAL);
     ImageButton keyboard = new ImageButton(context);

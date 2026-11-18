@@ -143,7 +143,8 @@ public abstract class AnySoftKeyboardInlineSuggestions extends AnySoftKeyboardSu
     if (inputViewContainer != null) {
       if (inputViewContainer.findViewById(R.id.inline_suggestions_list)
           instanceof ScrollViewAsMainChild lister) {
-        if (reshowStandardKeyboard && getInputView() instanceof View standardKeyboardView) {
+        if (reshowStandardKeyboard && lister.getVisibility() == View.VISIBLE
+            && getInputView() instanceof View standardKeyboardView) {
           standardKeyboardView.setVisibility(View.VISIBLE);
         }
         lister.removeAllListItems();
@@ -172,6 +173,7 @@ public abstract class AnySoftKeyboardInlineSuggestions extends AnySoftKeyboardSu
     params.width = inputViewContainer.getWidth();
     lister.setLayoutParams(params);
     lister.setBackground(actualInputView.getBackground());
+    lister.setVisibility(View.GONE);
     inputViewContainer.addView(lister);
 
     // inflating all inline-suggestion view and pushing into the linear-layout
@@ -188,14 +190,20 @@ public abstract class AnySoftKeyboardInlineSuggestions extends AnySoftKeyboardSu
       if (inlineSuggestion.getInfo().isPinned()) pinned.add(inlineSuggestion);
       else notPinned.add(inlineSuggestion);
     }
+    int[] failed = {0};
+    final int expected = inlineSuggestions.size();
+    Runnable onUnavailable = () -> {
+      if (++failed[0] == expected && lister.getParent() == getInputViewContainer()) {
+        cleanUpInlineLayouts(true);
+      }
+    };
     for (InlineSuggestion inlineSuggestion : pinned) {
-      addInlineSuggestionToList(viewContext, lister, size, inlineSuggestion);
+      addInlineSuggestionToList(viewContext, lister, size, inlineSuggestion, onUnavailable);
     }
     for (InlineSuggestion inlineSuggestion : notPinned) {
-      addInlineSuggestionToList(viewContext, lister, size, inlineSuggestion);
+      addInlineSuggestionToList(viewContext, lister, size, inlineSuggestion, onUnavailable);
     }
 
-    actualInputView.setVisibility(View.GONE);
     updateBackCallbackState();
     return null;
   }
@@ -205,7 +213,8 @@ public abstract class AnySoftKeyboardInlineSuggestions extends AnySoftKeyboardSu
       @NonNull Context viewContext,
       @NonNull ScrollViewAsMainChild lister,
       @NonNull Size size,
-      @NonNull InlineSuggestion inlineSuggestion) {
+      @NonNull InlineSuggestion inlineSuggestion,
+      @NonNull Runnable onUnavailable) {
     var info = inlineSuggestion.getInfo();
     Logger.i(
         "ASK_Suggestion",
@@ -219,7 +228,20 @@ public abstract class AnySoftKeyboardInlineSuggestions extends AnySoftKeyboardSu
         size,
         getMainExecutor(),
         v -> {
-          if (v == null || lister.getParent() == null) return;
+          if (lister.getParent() == null || lister.getParent() != getInputViewContainer()) return;
+          if (v == null) {
+            onUnavailable.run();
+            return;
+          }
+          if (lister.getVisibility() != View.VISIBLE) {
+            final View keyboard = (View) getInputView();
+            if (keyboard == null || keyboard.getVisibility() != View.VISIBLE) {
+              cleanUpInlineLayouts(false);
+              return;
+            }
+            keyboard.setVisibility(View.GONE);
+            lister.setVisibility(View.VISIBLE);
+          }
           v.setOnClickListener(v1 -> cleanUpInlineLayouts(true));
           lister.addListItem(v);
         });

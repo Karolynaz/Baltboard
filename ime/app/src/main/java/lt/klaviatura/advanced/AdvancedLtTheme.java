@@ -18,6 +18,18 @@ public final class AdvancedLtTheme {
   public static final String STEVE_LIGHT = "201a874a-3db8-4acf-904f-83055b0ab327";
   public static final String STEVE_DARK = "3e1e38c1-89c2-480b-a81f-e75aa373b0c5";
   public static final String MODE = "advanced_lt_theme_mode";
+  public static final String IOS_STYLE = "advanced_lt_ios_style";
+
+  public static boolean usesIosStyle(Context context, String themeId) {
+    return com.anysoftkeyboard.prefs.DirectBootAwareSharedPreferences.create(context)
+        .getBoolean(IOS_STYLE, STEVE_LIGHT.equals(themeId) || STEVE_DARK.equals(themeId));
+  }
+
+  public static String themeId(boolean day, boolean iosStyle) {
+    if (iosStyle) return day ? STEVE_LIGHT : STEVE_DARK;
+    return day ? DAY : NIGHT;
+  }
+
   private AdvancedLtTheme() {}
 
   public static boolean isDay(Context context) {
@@ -42,6 +54,15 @@ public final class AdvancedLtTheme {
   public static int accent(Context context) {
     return context.getColor(isDay(context) ? R.color.advanced_lt_pressed_color : R.color.advanced_lt_pressed_light_color);
   }
+  public static boolean usesGlass(Context context) {
+    return com.anysoftkeyboard.prefs.DirectBootAwareSharedPreferences.create(context)
+        .getBoolean(context.getString(R.string.settings_key_baltboard_glass), false);
+  }
+
+  public static int panelSurface(Context context) {
+    return usesGlass(context) ? Color.TRANSPARENT : surface(context);
+  }
+
   public static GradientDrawable glassBackground(Context context) {
     final int color = surface(context);
     final int tint = color & 0x00ffffff;
@@ -53,12 +74,14 @@ public final class AdvancedLtTheme {
   }
   public static GradientDrawable fade(Context context) {
     int color = surface(context);
+    if (usesGlass(context)) color = (color & 0x00ffffff) | 0x66000000;
     return new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
-        new int[] {color, (color & 0x00ffffff) | 0xe6000000, color & 0x00ffffff});
+        new int[] {color, (color & 0x00ffffff) | (Color.alpha(color) * 9 / 10 << 24), color & 0x00ffffff});
   }
   public static GradientDrawable rounded(Context context, boolean selected) {
     GradientDrawable shape = new GradientDrawable();
-    shape.setColor(card(context));
+    int fill = card(context);
+    shape.setColor(usesGlass(context) ? (fill & 0x00ffffff) | 0xcc000000 : fill);
     shape.setCornerRadius(16 * context.getResources().getDisplayMetrics().density);
     shape.setStroke(Math.round(context.getResources().getDisplayMetrics().density),
         selected ? accent(context) : (isDay(context) ? Color.LTGRAY : Color.GRAY));

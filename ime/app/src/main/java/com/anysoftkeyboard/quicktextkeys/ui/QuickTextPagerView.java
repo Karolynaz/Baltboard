@@ -173,7 +173,7 @@ public class QuickTextPagerView extends LinearLayout
   }
 
   private void refreshPanelTheme() {
-    setBackgroundColor(lt.klaviatura.advanced.AdvancedLtTheme.surface(getContext()));
+    setBackgroundColor(lt.klaviatura.advanced.AdvancedLtTheme.panelSurface(getContext()));
     findViewById(R.id.quick_text_bottom_fade).setBackground(lt.klaviatura.advanced.AdvancedLtTheme.fade(getContext()));
     mTabTitleTextColor = ColorStateList.valueOf(lt.klaviatura.advanced.AdvancedLtTheme.text(getContext()));
     ((ImageView)findViewById(R.id.quick_keys_popup_close)).setImageTintList(mTabTitleTextColor);

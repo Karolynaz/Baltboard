@@ -63,9 +63,11 @@ public class KeyboardThemeFactory extends AddOnsFactory.SingleAddOnsFactory<Keyb
   public void applyAutomaticTheme(android.content.res.Configuration configuration) {
     if (!"auto".equals(DirectBootAwareSharedPreferences.create(mContext)
         .getString(lt.klaviatura.advanced.AdvancedLtTheme.MODE, "manual"))) return;
-    String id = (configuration.uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
-        == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        ? lt.klaviatura.advanced.AdvancedLtTheme.NIGHT : lt.klaviatura.advanced.AdvancedLtTheme.DAY;
+    final boolean day = (configuration.uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
+        != android.content.res.Configuration.UI_MODE_NIGHT_YES;
+    final boolean ios = lt.klaviatura.advanced.AdvancedLtTheme.usesIosStyle(
+        mContext, getEnabledAddOn().getId());
+    final String id = lt.klaviatura.advanced.AdvancedLtTheme.themeId(day, ios);
     if (!id.equals(getEnabledAddOn().getId())) setAddOnEnabled(id, true);
   }
 

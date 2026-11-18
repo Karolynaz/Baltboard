@@ -129,19 +129,7 @@ public class KeyboardViewContainerView extends ViewGroup implements ThemeableChi
     if (mCandidateView != null && !mUpdatingActionStrip) {
       mUpdatingActionStrip = true;
       try {
-      // calculating the actual needed visibility:
-      // at least one visible view which is a ActionsStripSupportedChild
-      var visible = false;
-      for (int childIndex = 0; childIndex < getChildCount(); childIndex++) {
-        var child = getChildAt(childIndex);
-        if (child.getVisibility() == View.VISIBLE) {
-          if (child instanceof ActionsStripSupportedChild) {
-            visible = requestedVisibility;
-            break;
-          }
-        }
-      }
-
+        final boolean visible = shouldDisplayActionsStrip();
       final int targetVisibility = visible ? View.VISIBLE : View.GONE;
       if (targetVisibility != mCandidateView.getVisibility()) {
         mCandidateView.setVisibility(targetVisibility);
@@ -163,6 +151,17 @@ public class KeyboardViewContainerView extends ViewGroup implements ThemeableChi
         mUpdatingActionStrip = false;
       }
     }
+  }
+
+  private boolean shouldDisplayActionsStrip() {
+    if (!mShowActionStrip) return false;
+    for (int index = 0; index < getChildCount(); index++) {
+      View child = getChildAt(index);
+      if (child instanceof ActionsStripSupportedChild && child.getVisibility() == View.VISIBLE) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public void addStripAction(@NonNull StripActionProvider provider, boolean highPriority) {
@@ -251,10 +250,15 @@ public class KeyboardViewContainerView extends ViewGroup implements ThemeableChi
 
   @Override
   protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    // Returning to an existing keyboard can change child visibility without adding a view.
+    if (shouldDisplayActionsStrip() != (mCandidateView.getVisibility() == View.VISIBLE)) {
+      setActionsStripVisibility(mShowActionStrip);
+    }
     boolean otherActionVisible = false;
     for (View action : mStripActionViews) {
       StripActionProvider provider = (StripActionProvider)action.getTag(PROVIDER_TAG_ID);
-      if (!provider.isBalticboardNavigation() && action.getVisibility() == View.VISIBLE) otherActionVisible = true;
+      if (!provider.isBalticboardNavigation() && action.getParent() == this
+          && action.getVisibility() == View.VISIBLE) otherActionVisible = true;
     }
     for (View action : mStripActionViews) {
       ((StripActionProvider)action.getTag(PROVIDER_TAG_ID)).onOtherActionVisibilityChanged(otherActionVisible);

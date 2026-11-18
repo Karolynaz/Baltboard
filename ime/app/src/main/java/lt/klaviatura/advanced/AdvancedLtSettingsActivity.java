@@ -278,64 +278,53 @@ public final class AdvancedLtSettingsActivity extends AppCompatActivity {
     addIntro(content, tr("Pasirinkite klaviatūros spalvą.", "Choose the keyboard color."));
 
     final KeyboardThemeFactory factory = AnyApplication.getKeyboardThemeFactory(this);
-    String currentId = factory.getEnabledAddOn().getId();
-    if (!THEME_GRAY.equals(currentId)
-        && !THEME_WHITE.equals(currentId)
-        && !AdvancedLtTheme.STEVE_LIGHT.equals(currentId)
-        && !AdvancedLtTheme.STEVE_DARK.equals(currentId)) {
-      factory.setAddOnEnabled(THEME_GRAY, true);
-      currentId = THEME_GRAY;
-    }
+    final var themePreferences = com.anysoftkeyboard.prefs.DirectBootAwareSharedPreferences.create(this);
+    final String activeId = factory.getEnabledAddOn().getId();
+    final boolean iosStyle = AdvancedLtTheme.usesIosStyle(this, activeId);
+    final String currentId = "auto".equals(themePreferences.getString(AdvancedLtTheme.MODE, "manual"))
+        ? "auto" : AdvancedLtTheme.themeId(AdvancedLtTheme.isLightTheme(activeId), false);
     final RadioGroup choices = new RadioGroup(this);
     choices.setOrientation(LinearLayout.VERTICAL);
     choices.setBackground(rounded(CARD, 28, 0, Color.TRANSPARENT));
     choices.setPadding(0, dp(8), 0, dp(8));
-
-    boolean automatic = "auto".equals(com.anysoftkeyboard.prefs.DirectBootAwareSharedPreferences.create(this)
-        .getString(AdvancedLtTheme.MODE, "manual"));
-    if (automatic) currentId = "auto";
-    choices.addView(themeChoice(R.id.advanced_lt_theme_gray, "Night", THEME_GRAY, currentId));
-    choices.addView(themeChoice(R.id.advanced_lt_theme_white, "Day", THEME_WHITE, currentId));
     choices.addView(themeChoice(R.id.advanced_lt_theme_auto, "Auto", "auto", currentId));
-    choices.addView(themeChoice(R.id.advanced_lt_theme_steve_light,
-        "Steve Light", AdvancedLtTheme.STEVE_LIGHT, currentId));
-    choices.addView(themeChoice(R.id.advanced_lt_theme_steve_dark,
-        "Steve Dark", AdvancedLtTheme.STEVE_DARK, currentId));
-    choices.setOnCheckedChangeListener(
-        (group, checkedId) -> {
-          boolean auto = checkedId == R.id.advanced_lt_theme_auto;
-          com.anysoftkeyboard.prefs.DirectBootAwareSharedPreferences.create(this).edit()
-              .putString(AdvancedLtTheme.MODE, auto ? "auto" : "manual").apply();
-          if (auto) {
-            factory.applyAutomaticTheme(getResources().getConfiguration());
-            if (mThemeSummary != null) mThemeSummary.setText(currentThemeName());
-            return;
-          }
-          final String themeId;
-          if (checkedId == R.id.advanced_lt_theme_gray) {
-            themeId = THEME_GRAY;
-          } else if (checkedId == R.id.advanced_lt_theme_white) {
-            themeId = THEME_WHITE;
-          } else if (checkedId == R.id.advanced_lt_theme_steve_light) {
-            themeId = AdvancedLtTheme.STEVE_LIGHT;
-          } else if (checkedId == R.id.advanced_lt_theme_steve_dark) {
-            themeId = AdvancedLtTheme.STEVE_DARK;
-          } else {
-            themeId = THEME_GRAY;
-          }
-          factory.setAddOnEnabled(themeId, true);
-          if (mThemeSummary != null) mThemeSummary.setText(currentThemeName());
-        });
+    choices.addView(themeChoice(R.id.advanced_lt_theme_white, "Day", THEME_WHITE, currentId));
+    choices.addView(themeChoice(R.id.advanced_lt_theme_gray, "Night", THEME_GRAY, currentId));
+
+    final View style = switchRow(tr("iOS klaviatūros stilius", "iOS keyboard style"),
+        tr("Pritaiko šviesų arba tamsų „iOS“ klaviatūros stilių.",
+            "Apply the light or dark iOS keyboard style."),
+        iosStyle, R.id.advanced_lt_ios_style,
+        (ignored, checked) -> applyThemeChoice(factory, choices.getCheckedRadioButtonId(), checked));
+    final SwitchCompat styleToggle = style.findViewById(R.id.advanced_lt_ios_style);
+    choices.setOnCheckedChangeListener((group, checkedId) -> {
+      if (checkedId != View.NO_ID) applyThemeChoice(factory, checkedId, styleToggle.isChecked());
+    });
     content.addView(choices, sectionParams());
     final SharedPreferences preferences = keyboardPreferences();
     final String glassKey = getString(R.string.settings_key_baltboard_glass);
-    content.addView(card(switchRow(
+    content.addView(card(style, switchRow(
         tr("Permatomas stiklo fonas", "Translucent glass background"),
         tr("Pusiau permatomas klaviatūros fonas", "Use a translucent keyboard background"),
         preferences.getBoolean(glassKey, false),
         R.id.advanced_lt_glass,
         (ignored, checked) -> preferences.edit().putBoolean(glassKey, checked).apply())));
     addBottomSpace(content);
+  }
+
+  private void applyThemeChoice(KeyboardThemeFactory factory, int checkedId, boolean iosStyle) {
+    final boolean automatic = checkedId == R.id.advanced_lt_theme_auto;
+    com.anysoftkeyboard.prefs.DirectBootAwareSharedPreferences.create(this).edit()
+        .putString(AdvancedLtTheme.MODE, automatic ? "auto" : "manual")
+        .putBoolean(AdvancedLtTheme.IOS_STYLE, iosStyle)
+        .apply();
+    if (automatic) {
+      factory.applyAutomaticTheme(getResources().getConfiguration());
+    } else {
+      factory.setAddOnEnabled(
+          AdvancedLtTheme.themeId(checkedId == R.id.advanced_lt_theme_white, iosStyle), true);
+    }
+    if (mThemeSummary != null) mThemeSummary.setText(currentThemeName());
   }
 
   private void showEmoji() {
@@ -828,12 +817,12 @@ public final class AdvancedLtSettingsActivity extends AppCompatActivity {
     final SecretStore secretStore = new SecretStore(this, provider);
 
     form.addView(label(tr("API raktas", "API key")));
-    mApiKey =
-        field(
-            secretStore.exists()
-                ? tr("API raktas jau išsaugotas", "API key is already saved")
-                : tr("Įveskite API raktą", "Enter API key"));
+    final boolean[] hasSavedKey = {secretStore.exists()};
+    final String enterKey = tr("Įveskite API raktą", "Enter API key");
+    mApiKey = field(hasSavedKey[0] ? "••••••••" : enterKey);
     mApiKey.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+    mApiKey.setSingleLine(true);
+    mApiKey.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
     final FrameLayout apiKeyRow = new FrameLayout(this);
     final FrameLayout.LayoutParams apiKeyParams = new FrameLayout.LayoutParams(-1, dp(56));
     mApiKey.setPadding(dp(14), 0, dp(56), 0);
@@ -847,6 +836,27 @@ public final class AdvancedLtSettingsActivity extends AppCompatActivity {
     apiKeyMenu.setPadding(dp(12), dp(12), dp(12), dp(12));
     apiKeyRow.addView(apiKeyMenu, new FrameLayout.LayoutParams(dp(48), dp(56), Gravity.END | Gravity.CENTER_VERTICAL));
     form.addView(apiKeyRow, matchWrap());
+    final TextView apiKeyStatus = text("", 14f, SECONDARY);
+    apiKeyStatus.setPadding(0, dp(6), 0, 0);
+    apiKeyStatus.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+    form.addView(apiKeyStatus, matchWrap());
+    final Runnable updateApiKeyStatus = () -> {
+      final boolean hasDraft = !mApiKey.getText().toString().trim().isEmpty();
+      apiKeyStatus.setVisibility(hasDraft || hasSavedKey[0] ? View.VISIBLE : View.GONE);
+      apiKeyStatus.setText(hasDraft
+          ? tr("API raktas pridėtas. Paspauskite „Išsaugoti“.", "API key added. Tap Save.")
+          : tr("API raktas išsaugotas", "API key saved"));
+      mApiKey.setHint(hasSavedKey[0] ? "••••••••" : enterKey);
+    };
+    mApiKey.addTextChangedListener(new android.text.TextWatcher() {
+      @Override public void beforeTextChanged(CharSequence text, int start, int count, int after) {}
+      @Override public void onTextChanged(CharSequence text, int start, int before, int count) {}
+      @Override public void afterTextChanged(android.text.Editable text) {
+        updateApiKeyStatus.run();
+      }
+    });
+    updateApiKeyStatus.run();
+
 
     form.addView(labelWithTopMargin(tr("Modelis", "Model")));
     mModel = field("gemini".equals(provider) ? DEFAULT_MODEL
@@ -858,13 +868,11 @@ public final class AdvancedLtSettingsActivity extends AppCompatActivity {
         form,
         tr("Taisymo instrukcija", "Correction instructions"),
         preferences.getString(PREF_PROMPT, GeminiClient.DEFAULT_PROMPT),
-        tr("Atkurti numatytąją taisymo instrukciją", "Restore default correction instructions"),
         GeminiClient.DEFAULT_PROMPT);
     final EditText translateInstruction = instructionEditor(
         form,
         tr("Vertimo instrukcija", "Translate instructions"),
         preferences.getString(PREF_TRANSLATE_PROMPT, GeminiClient.DEFAULT_TRANSLATE_PROMPT),
-        tr("Atkurti numatytąją vertimo instrukciją", "Restore default translation instructions"),
         GeminiClient.DEFAULT_TRANSLATE_PROMPT);
 
     final Button save = primaryButton(tr("Išsaugoti", "Save"));
@@ -874,8 +882,8 @@ public final class AdvancedLtSettingsActivity extends AppCompatActivity {
             final String key = mApiKey.getText().toString().trim();
             if (!key.isEmpty()) {
               secretStore.save(key);
+              hasSavedKey[0] = true;
               mApiKey.setText("");
-              mApiKey.setHint(tr("API raktas jau išsaugotas", "API key is already saved"));
             }
             preferences.edit().putString(modelPreference(provider), mModel.getText().toString().trim())
                 .putString(PREF_PROMPT, instruction.getText().toString().isBlank()
@@ -930,8 +938,8 @@ public final class AdvancedLtSettingsActivity extends AppCompatActivity {
           removeItem.setOnMenuItemClickListener(
               item -> {
                 secretStore.remove();
+                hasSavedKey[0] = false;
                 mApiKey.setText("");
-                mApiKey.setHint(tr("Įveskite API raktą", "Enter API key"));
                 toast(tr("API raktas pašalintas", "API key removed"));
                 return true;
               });
@@ -1464,10 +1472,20 @@ public final class AdvancedLtSettingsActivity extends AppCompatActivity {
       LinearLayout form,
       String title,
       String value,
-      String restoreTitle,
       String defaultValue) {
-    form.addView(labelWithTopMargin(title));
     final EditText instruction = field(title);
+    final LinearLayout header = new LinearLayout(this);
+    header.setGravity(Gravity.CENTER_VERTICAL);
+    final TextView heading = label(title);
+    header.addView(heading, new LinearLayout.LayoutParams(0, -2, 1f));
+    final Button restore = button(tr("Atkurti", "Set default"));
+    restore.setBackgroundResource(android.R.drawable.list_selector_background);
+    restore.setTextColor(Build.VERSION.SDK_INT >= 31
+        ? getColor(R.color.advanced_lt_pressed_light_color) : ACCENT);
+    restore.setMinHeight(dp(48));
+    restore.setOnClickListener(view -> instruction.setText(defaultValue));
+    header.addView(restore, new LinearLayout.LayoutParams(-2, -2));
+    form.addView(header, matchWrap());
     instruction.setSingleLine(false);
     instruction.setMinLines(3);
     instruction.setMaxLines(3);
@@ -1526,9 +1544,6 @@ public final class AdvancedLtSettingsActivity extends AppCompatActivity {
           .showSoftInput(view, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
     });
 
-    final Button restore = secondaryButton(restoreTitle);
-    restore.setOnClickListener(v -> instruction.setText(defaultValue));
-    form.addView(restore, buttonParams());
     return instruction;
   }
 
@@ -1607,9 +1622,7 @@ public final class AdvancedLtSettingsActivity extends AppCompatActivity {
     final String current = AnyApplication.getKeyboardThemeFactory(this).getEnabledAddOn().getId();
     if ("auto".equals(com.anysoftkeyboard.prefs.DirectBootAwareSharedPreferences.create(this)
         .getString(AdvancedLtTheme.MODE, "manual"))) return "Auto";
-    if (AdvancedLtTheme.STEVE_LIGHT.equals(current)) return "Steve Light";
-    if (AdvancedLtTheme.STEVE_DARK.equals(current)) return "Steve Dark";
-    return THEME_WHITE.equals(current) ? "Day" : "Night";
+    return AdvancedLtTheme.isLightTheme(current) ? "Day" : "Night";
   }
 
   @NonNull

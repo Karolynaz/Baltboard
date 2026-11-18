@@ -226,6 +226,14 @@ public abstract class AnySoftKeyboardClipboard extends AnySoftKeyboardSwipeListe
   }
 
   @NonNull
+  protected final boolean isClipboardFavorite(int index) {
+    return mClipboard.isFavorite(index);
+  }
+
+  protected final boolean toggleClipboardFavorite(int index) {
+    return mClipboard.toggleFavorite(index);
+  }
+
   protected final List<CharSequence> getClipboardHistoryEntries() {
     final int entriesCount = mClipboard.getClipboardEntriesCount();
     final List<CharSequence> entries = new ArrayList<>(entriesCount);

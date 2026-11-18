@@ -76,6 +76,23 @@ public class KeyboardViewContainerViewTest {
   }
 
   @Test
+  public void restoresStripWhenOnlyKeyboardVisibilityChanges() {
+    View keyboard = (View) mUnderTest.getStandardKeyboardView();
+    View action = new View(mUnderTest.getContext());
+    var provider = Mockito.mock(KeyboardViewContainerView.StripActionProvider.class);
+    Mockito.doReturn(action).when(provider).inflateActionView(any());
+    mUnderTest.addStripAction(provider, false);
+    int spec = View.MeasureSpec.makeMeasureSpec(800, View.MeasureSpec.EXACTLY);
+    keyboard.setVisibility(View.GONE);
+    mUnderTest.measure(spec, spec);
+    Assert.assertNull(action.getParent());
+    keyboard.setVisibility(View.VISIBLE);
+    mUnderTest.measure(spec, spec);
+    Assert.assertEquals(View.VISIBLE, mUnderTest.getCandidateView().getVisibility());
+    Assert.assertSame(mUnderTest, action.getParent());
+  }
+
+  @Test
   public void testSettingPadding() {
     AnyKeyboardView mock = Mockito.mock(AnyKeyboardView.class);
     mUnderTest.addView(mock);

@@ -25,14 +25,18 @@ import androidx.annotation.Nullable;
 import com.menny.android.anysoftkeyboard.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.text.Normalizer;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 public class ClipboardV11 implements Clipboard {
-  private static final int MAX_ENTRIES_COUNT = 20;
+  private static final int MAX_ENTRIES_COUNT = 25;
   private static final String HISTORY_PREFS_NAME = "advanced_lt_clipboard_history";
   private static final String HISTORY_PREFS_KEY = "entries";
+
+  private final Set<String> mFavorites = new HashSet<>();
 
   protected final List<CharSequence> mEntries = new ArrayList<>(MAX_ENTRIES_COUNT);
   protected final ClipboardManager mClipboardManager;
@@ -56,7 +60,7 @@ public class ClipboardV11 implements Clipboard {
   @Override
   public void setClipboardUpdatedListener(@Nullable ClipboardUpdatedListener listener) {
     if (mListenerWasConfigured && mClipboardEntryAddedListener != listener) {
-      mEntries.clear();
+      mEntries.removeIf(entry -> !mFavorites.contains(normalizedText(entry)));
       persistHistory();
     }
     if (listener == null) {
@@ -84,8 +88,22 @@ public class ClipboardV11 implements Clipboard {
   }
 
   @Override
+  public boolean isFavorite(int entryIndex) {
+    return mFavorites.contains(normalizedText(mEntries.get(entryIndex)));
+  }
+
+  @Override
+  public boolean toggleFavorite(int entryIndex) {
+    final String text = normalizedText(mEntries.get(entryIndex));
+    final boolean selected = mFavorites.add(text);
+    if (!selected) mFavorites.remove(text);
+    persistHistory();
+    return selected;
+  }
+
+  @Override
   public void deleteEntry(int entryIndex) {
-    mEntries.remove(entryIndex);
+    mFavorites.remove(normalizedText(mEntries.remove(entryIndex)));
     persistHistory();
     if (entryIndex == 0) {
       clearPrimaryClip();
@@ -99,6 +117,7 @@ public class ClipboardV11 implements Clipboard {
   @Override
   public void deleteAllEntries() {
     mEntries.clear();
+    mFavorites.clear();
     persistHistory();
     clearPrimaryClip();
   }
@@ -132,8 +151,8 @@ public class ClipboardV11 implements Clipboard {
           }
           mEntries.add(0, storedText);
 
-          while (mEntries.size() > MAX_ENTRIES_COUNT) {
-            mEntries.remove(MAX_ENTRIES_COUNT);
+          for (int index = mEntries.size() - 1; index >= MAX_ENTRIES_COUNT; index--) {
+            if (!isFavorite(index)) mEntries.remove(index);
           }
 
           persistHistory();
@@ -169,11 +188,13 @@ public class ClipboardV11 implements Clipboard {
     try {
       final JSONArray entries = new JSONArray(storedHistory);
       for (int index = 0;
-          index < entries.length() && mEntries.size() < MAX_ENTRIES_COUNT;
+          index < entries.length();
           index++) {
-        final String text = entries.optString(index, "");
+        final var saved = entries.optJSONObject(index);
+        final String text = saved == null ? entries.optString(index, "") : saved.optString("text");
         if (!TextUtils.isEmpty(text) && findEntry(text) < 0) {
           mEntries.add(text);
+          if (saved != null && saved.optBoolean("favorite")) mFavorites.add(normalizedText(text));
         }
       }
     } catch (JSONException ignored) {
@@ -185,7 +206,14 @@ public class ClipboardV11 implements Clipboard {
     if (BuildConfig.TESTING_BUILD) return;
     final JSONArray entries = new JSONArray();
     for (CharSequence entry : mEntries) {
-      entries.put(entry.toString());
+      final var saved = new org.json.JSONObject();
+      try {
+        saved.put("text", entry.toString());
+        saved.put("favorite", mFavorites.contains(normalizedText(entry)));
+      } catch (JSONException exception) {
+        throw new IllegalStateException(exception);
+      }
+      entries.put(saved);
     }
     mHistoryPreferences.edit().putString(HISTORY_PREFS_KEY, entries.toString()).apply();
   }

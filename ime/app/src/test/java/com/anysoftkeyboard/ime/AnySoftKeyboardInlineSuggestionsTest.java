@@ -137,13 +137,27 @@ public class AnySoftKeyboardInlineSuggestionsTest extends AnySoftKeyboardBaseTes
   public void emptyResponseClosesExpandedAutofillPanel() {
     simulateOnStartInputFlow();
     var container = mAnySoftKeyboardUnderTest.getInputViewContainer();
-    // The provider may withdraw the suggestion even if its content never inflates.
-    mAnySoftKeyboardUnderTest.onInlineSuggestionsResponse(
-        mockResponse((InlineContentView) null));
+    // The provider can withdraw a suggestion while its content is still loading.
+    var response = mockResponse((InlineContentView) null);
+    var pending = response.getInlineSuggestions().get(0);
+    Mockito.doNothing().when(pending).inflate(any(), any(), any(), any());
+    mAnySoftKeyboardUnderTest.onInlineSuggestionsResponse(response);
     container.findViewById(R.id.inline_suggestions_strip_root).performClick();
-    Assert.assertNotNull(container.findViewById(R.id.inline_suggestions_list));
+    Assert.assertEquals(View.GONE, container.findViewById(R.id.inline_suggestions_list).getVisibility());
+    Assert.assertEquals(View.VISIBLE, ((View) mAnySoftKeyboardUnderTest.getInputView()).getVisibility());
 
     Assert.assertFalse(mAnySoftKeyboardUnderTest.onInlineSuggestionsResponse(mockResponse()));
+    Assert.assertNull(container.findViewById(R.id.inline_suggestions_list));
+    Assert.assertEquals(View.VISIBLE, ((View) mAnySoftKeyboardUnderTest.getInputView()).getVisibility());
+    Assert.assertEquals(View.VISIBLE, container.getCandidateView().getVisibility());
+  }
+
+  @Test
+  public void failedAutofillViewsRestoreKeyboardWithoutAnotherResponse() {
+    simulateOnStartInputFlow();
+    var container = mAnySoftKeyboardUnderTest.getInputViewContainer();
+    mAnySoftKeyboardUnderTest.onInlineSuggestionsResponse(mockResponse((InlineContentView) null, (InlineContentView) null));
+    container.findViewById(R.id.inline_suggestions_strip_root).performClick();
     Assert.assertNull(container.findViewById(R.id.inline_suggestions_list));
     Assert.assertEquals(View.VISIBLE, ((View) mAnySoftKeyboardUnderTest.getInputView()).getVisibility());
     Assert.assertEquals(View.VISIBLE, container.getCandidateView().getVisibility());

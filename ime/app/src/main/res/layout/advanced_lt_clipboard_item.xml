@@ -14,7 +14,7 @@
         android:ellipsize="end"
         android:maxLines="4"
         android:textColor="#FFFFFFFF"
-        android:textSize="18sp" />
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/advanced_lt_clipboard_item_selection"
@@ -27,4 +27,13 @@
         android:textStyle="bold"
         android:visibility="gone" />
 
+    <ImageView
+        android:id="@+id/advanced_lt_clipboard_item_favorite"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_gravity="end|top"
+        android:importantForAccessibility="no"
+        android:scaleType="center"
+        android:src="@drawable/advanced_lt_bookmark_filled"
+        android:visibility="gone" />
 </FrameLayout>

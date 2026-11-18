@@ -67,6 +67,7 @@ public class SoftKeyboard extends PublicNotices {
   private Handler mDelayer = null;
   private AdvancedLtToolbarAction mAdvancedLtToolbar;
   private boolean mShowingWordSuggestions;
+  private boolean mShowingCandidateAction;
   private AdvancedLtSuggestionActions mAdvancedLtSuggestionActions;
   private AdvancedLtClipboardView mAdvancedLtClipboardView;
   private GeminiClient mGeminiClient;
@@ -122,13 +123,16 @@ public class SoftKeyboard extends PublicNotices {
     mInputSessionId++;
     if (mGeminiClient != null) mGeminiClient.close();
     closeRewrite(false);
+    detachToolbar();
     super.onDestroy();
   }
 
   @Override
   public View onCreateInputView() {
+    detachToolbar();
     final View container = super.onCreateInputView();
     if (!BuildConfig.TESTING_BUILD && getInputView() instanceof View keyboard) {
+      attachToolbar();
       keyboard.addOnLayoutChangeListener(
           (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             if (right - left != oldRight - oldLeft) {
@@ -169,8 +173,7 @@ public class SoftKeyboard extends PublicNotices {
     final var container = getInputViewContainer();
     if (container == null || getWindow() == null || getWindow().getWindow() == null) return;
     final Window window = getWindow().getWindow();
-    final boolean enabled = DirectBootAwareSharedPreferences.create(this)
-        .getBoolean(getString(R.string.settings_key_baltboard_glass), false);
+    final boolean enabled = AdvancedLtTheme.usesGlass(this);
     if (enabled && mGlassWindow != window) {
       mGlassWindow = window;
       mOpaqueWindowBackground = window.getDecorView().getBackground();
@@ -204,19 +207,25 @@ public class SoftKeyboard extends PublicNotices {
     mAdvancedLtToolbar.setTranslateEnabled(
         getSharedPreferences(AdvancedLtSettingsActivity.PREFS_NAME, MODE_PRIVATE)
             .getBoolean(AdvancedLtSettingsActivity.PREF_AI_TRANSLATE_ENABLED, false));
+    getInputViewContainer().setActionsStripVisibility(true);
+    refreshClipboardHint();
+  }
+
+  private void attachToolbar() {
     getInputViewContainer().addStripAction(mAdvancedLtToolbar, false);
     mAdvancedLtSuggestionActions.attach(getInputViewContainer());
     mShowingWordSuggestions = false;
+    mShowingCandidateAction = false;
     getInputViewContainer().getCandidateView().setActionStateListener(active -> {
-      mAdvancedLtToolbar.setVisible(!active && !mShowingWordSuggestions);
-      mAdvancedLtSuggestionActions.setSpecialAction(active);
-      getInputViewContainer().getCandidateView().setPadding(active || mShowingWordSuggestions ? dp(52) : 0,
-          0, mShowingWordSuggestions && !active ? dp(52) : 0, 0);
+      mShowingCandidateAction = active;
+      if (getInputViewContainer().getCandidateView().getSuggestions().isEmpty()) {
+        mShowingWordSuggestions = false;
+        mAdvancedLtSuggestionActions.setSuggestions(Collections.emptyList());
+      }
+      updateToolbarVisibility();
     });
-    mAdvancedLtToolbar.setVisible(true);
+    updateToolbarVisibility();
     mAdvancedLtSuggestionActions.setSuggestions(Collections.emptyList());
-    getInputViewContainer().setActionsStripVisibility(true);
-    refreshClipboardHint();
   }
 
   @Override
@@ -225,13 +234,15 @@ public class SoftKeyboard extends PublicNotices {
     mInputSessionId++;
     closeRewrite(false);
     closeAdvancedLtClipboard(false);
-    if (!BuildConfig.TESTING_BUILD) {
-      if (getInputViewContainer() != null && getInputViewContainer().getCandidateView() != null)
-        getInputViewContainer().getCandidateView().setActionStateListener(null);
-      mAdvancedLtSuggestionActions.detach();
-      getInputViewContainer().removeStripAction(mAdvancedLtToolbar);
-    }
     super.onFinishInputView(finishingInput);
+  }
+
+  private void detachToolbar() {
+    final var container = getInputViewContainer();
+    if (BuildConfig.TESTING_BUILD || container == null || mAdvancedLtSuggestionActions == null) return;
+    container.getCandidateView().setActionStateListener(null);
+    mAdvancedLtSuggestionActions.detach();
+    container.removeStripAction(mAdvancedLtToolbar);
   }
 
   private void showAdvancedLtClipboard() {
@@ -260,6 +271,16 @@ public class SoftKeyboard extends PublicNotices {
               @Override
               public void onPaste(@NonNull CharSequence text) {
                 pasteClipboardText(text);
+              }
+
+              @Override
+              public boolean isFavorite(int index) {
+                return isClipboardFavorite(index);
+              }
+
+              @Override
+              public boolean toggleFavorite(int index) {
+                return toggleClipboardFavorite(index);
               }
 
               @Override
@@ -394,6 +415,7 @@ public class SoftKeyboard extends PublicNotices {
     super.onThemeChanged(theme);
     if (!BuildConfig.TESTING_BUILD) updateGlassBackground();
     if (mAdvancedLtClipboardView != null) mAdvancedLtClipboardView.refreshTheme();
+    if (mRewriteView != null) mRewriteView.setBackgroundColor(AdvancedLtTheme.panelSurface(this));
   }
 
   @Override
@@ -418,19 +440,27 @@ public class SoftKeyboard extends PublicNotices {
       visibleSuggestions = Collections.emptyList();
       highlightedSuggestionIndex = -1;
     }
-    mShowingWordSuggestions = showWordSuggestions;
     super.setSuggestions(visibleSuggestions, highlightedSuggestionIndex);
-
-    if (mAdvancedLtToolbar != null) {
-      mAdvancedLtToolbar.setVisible(!showWordSuggestions);
-    }
+    final var container = getInputViewContainer();
+    mShowingWordSuggestions = showWordSuggestions && container != null
+        && container.getCandidateView() != null
+        && !container.getCandidateView().getSuggestions().isEmpty();
     if (mAdvancedLtSuggestionActions != null) {
       mAdvancedLtSuggestionActions.setSuggestions(
-          showWordSuggestions ? suggestions : Collections.emptyList());
+          mShowingWordSuggestions ? suggestions : Collections.emptyList());
     }
-    if (getInputViewContainer() != null && getInputViewContainer().getCandidateView() != null) {
-      final int sidePadding = showWordSuggestions ? dp(52) : 0;
-      getInputViewContainer().getCandidateView().setPadding(sidePadding, 0, sidePadding, 0);
+    updateToolbarVisibility();
+  }
+
+  private void updateToolbarVisibility() {
+    if (mAdvancedLtToolbar == null) return;
+    mAdvancedLtToolbar.setVisible(!mShowingCandidateAction && !mShowingWordSuggestions);
+    mAdvancedLtSuggestionActions.setSpecialAction(mShowingCandidateAction);
+    final var container = getInputViewContainer();
+    if (container != null && container.getCandidateView() != null) {
+      container.getCandidateView().setPadding(
+          mShowingCandidateAction || mShowingWordSuggestions ? dp(52) : 0,
+          0, mShowingWordSuggestions && !mShowingCandidateAction ? dp(52) : 0, 0);
     }
   }
 

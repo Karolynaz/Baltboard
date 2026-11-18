@@ -979,4 +979,5 @@
     <string name="touch_trajectory_correction_title">Touch trajectory correction</string>
     <string name="touch_trajectory_correction_summary_on">Improve key accuracy by combining touch-down and lift-off coordinates during fast typing</string>
     <string name="touch_trajectory_correction_summary_off">Rely strictly on touch lift-off coordinates</string>
+    <string name="advanced_lt_clipboard_favorites">Clipboard favorites</string>
 </resources>

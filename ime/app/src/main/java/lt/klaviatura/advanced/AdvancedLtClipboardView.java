@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -31,11 +32,18 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
 
     void onPaste(@NonNull CharSequence text);
 
+    default boolean isFavorite(int index) { return false; }
+
+    default boolean toggleFavorite(int index) { return false; }
+
     void onDelete(@NonNull List<Integer> positions);
   }
 
   private final List<CharSequence> mEntries = new ArrayList<>();
   private final Set<Integer> mSelectedPositions = new HashSet<>();
+  private final List<Integer> mVisiblePositions = new ArrayList<>();
+  private boolean mFavoritesOnly;
+  private ImageView mFavoritesFilter;
   private RecyclerView mGrid;
   private ClipboardAdapter mAdapter;
   private View mEmptyView;
@@ -57,7 +65,7 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
   }
 
   public void refreshTheme() {
-    setBackgroundColor(AdvancedLtTheme.surface(getContext()));
+    setBackgroundColor(AdvancedLtTheme.panelSurface(getContext()));
     AdvancedLtTheme.tintContents(this);
     int separatorColor = AdvancedLtTheme.isDay(getContext()) ? 0x40333333 : 0x40ffffff;
     for (int id : new int[] {R.id.advanced_lt_clipboard_separator,
@@ -65,7 +73,7 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
         R.id.advanced_lt_clipboard_confirmation_separator}) {
       findViewById(id).setBackgroundColor(separatorColor);
     }
-    ((View)mNormalToolbar.getParent()).setBackgroundColor(AdvancedLtTheme.surface(getContext()));
+    ((View)mNormalToolbar.getParent()).setBackgroundColor(AdvancedLtTheme.panelSurface(getContext()));
     mBottomFade.setBackground(AdvancedLtTheme.fade(getContext()));
     ((ViewGroup)mDeleteConfirmation).getChildAt(0).setBackground(AdvancedLtTheme.rounded(getContext(), false));
     mDeleteSelected.setTextColor(AdvancedLtTheme.isDay(getContext()) ? 0xffb3261e : 0xffff7373);
@@ -116,10 +124,16 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
     mConfirmationText =
         findViewById(R.id.advanced_lt_clipboard_delete_confirmation_text);
 
+    mFavoritesFilter = findViewById(R.id.advanced_lt_clipboard_favorites);
+    mFavoritesFilter.setOnClickListener(ignored -> {
+      mFavoritesOnly = !mFavoritesOnly;
+      refreshVisibleEntries();
+      mGrid.scrollToPosition(0);
+    });
     mAdapter = new ClipboardAdapter();
     mGrid.setLayoutManager(new GridLayoutManager(getContext(), 2));
     mGrid.setAdapter(mAdapter);
-    mGrid.addItemDecoration(new ClipboardItemSpacing(dp(4)));
+    mGrid.addItemDecoration(new ClipboardItemSpacing(dp(8)));
     mBaseGridBottomPadding = mGrid.getPaddingBottom();
     mBackspace = new AdvancedLtBackspaceButton(getContext());
     FrameLayout panel = (FrameLayout)mGrid.getParent();
@@ -158,6 +172,18 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
     if (mEntries.isEmpty()) {
       leaveSelectionMode();
     }
+    refreshVisibleEntries();
+  }
+
+  private void refreshVisibleEntries() {
+    mVisiblePositions.clear();
+    for (int index = 0; index < mEntries.size(); index++) {
+      if (!mFavoritesOnly || listener().isFavorite(index)) mVisiblePositions.add(index);
+    }
+    mFavoritesFilter.setSelected(mFavoritesOnly);
+    mFavoritesFilter.setImageTintList(android.content.res.ColorStateList.valueOf(AdvancedLtTheme.text(getContext())));
+    mFavoritesFilter.setImageResource(mFavoritesOnly
+        ? R.drawable.advanced_lt_bookmark_filled : R.drawable.advanced_lt_bookmark_outline);
     mAdapter.notifyDataSetChanged();
     updateUi();
   }
@@ -206,7 +232,7 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
       if (!mSelectedPositions.add(position)) {
         mSelectedPositions.remove(position);
       }
-      mAdapter.notifyItemChanged(position);
+      mAdapter.notifyItemChanged(mVisiblePositions.indexOf(position));
       updateSelectionToolbar();
     } else {
       listener().onPaste(mEntries.get(position));
@@ -214,7 +240,7 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
   }
 
   private void enterSelectionMode() {
-    if (mEntries.isEmpty()) return;
+    if (mVisiblePositions.isEmpty()) return;
     mSelectionMode = true;
     mSelectedPositions.clear();
     mAdapter.notifyDataSetChanged();
@@ -229,14 +255,9 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
   }
 
   private void toggleSelectAll() {
-    if (mSelectedPositions.size() == mEntries.size()) {
-      mSelectedPositions.clear();
-    } else {
-      mSelectedPositions.clear();
-      for (int position = 0; position < mEntries.size(); position++) {
-        mSelectedPositions.add(position);
-      }
-    }
+    final boolean allSelected = mSelectedPositions.size() == mVisiblePositions.size();
+    mSelectedPositions.clear();
+    if (!allSelected) mSelectedPositions.addAll(mVisiblePositions);
     mAdapter.notifyDataSetChanged();
     updateSelectionToolbar();
   }
@@ -270,10 +291,10 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
     if (mNormalToolbar == null) return;
     mNormalToolbar.setVisibility(mSelectionMode ? View.GONE : View.VISIBLE);
     mSelectionToolbar.setVisibility(mSelectionMode ? View.VISIBLE : View.GONE);
-    mEmptyView.setVisibility(mEntries.isEmpty() ? View.VISIBLE : View.GONE);
-    mGrid.setVisibility(mEntries.isEmpty() ? View.GONE : View.VISIBLE);
+    mEmptyView.setVisibility(mVisiblePositions.isEmpty() ? View.VISIBLE : View.GONE);
+    mGrid.setVisibility(mVisiblePositions.isEmpty() ? View.GONE : View.VISIBLE);
     findViewById(R.id.advanced_lt_clipboard_start_delete)
-        .setEnabled(!mEntries.isEmpty());
+        .setEnabled(!mVisiblePositions.isEmpty());
     updateSelectionToolbar();
   }
 
@@ -283,7 +304,7 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
     mSelectedCount.setText(String.valueOf(selectedCount));
     mDeleteSelected.setEnabled(selectedCount > 0);
     mDeleteSelected.setAlpha(selectedCount > 0 ? 1f : 0.35f);
-    final boolean allSelected = !mEntries.isEmpty() && selectedCount == mEntries.size();
+    final boolean allSelected = !mVisiblePositions.isEmpty() && selectedCount == mVisiblePositions.size();
     mSelectAll.setText(
         (allSelected ? "✓  " : "○  ")
             + getContext().getString(R.string.advanced_lt_clipboard_all));
@@ -321,9 +342,14 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
 
     @Override
     public void onBindViewHolder(@NonNull ClipboardViewHolder holder, int position) {
-      final boolean selected = mSelectedPositions.contains(position);
-      holder.text.setText(mEntries.get(position));
-      holder.text.setPadding(mSelectionMode ? dp(32) : 0, 0, 0, 0);
+      final int historyIndex = mVisiblePositions.get(position);
+      final boolean selected = mSelectedPositions.contains(historyIndex);
+      holder.favorite.animate().cancel();
+      holder.favorite.setAlpha(1f);
+      holder.favorite.setVisibility(listener().isFavorite(historyIndex) ? View.VISIBLE : View.GONE);
+      holder.favorite.setColorFilter(AdvancedLtTheme.text(getContext()));
+      holder.text.setText(mEntries.get(historyIndex));
+      holder.text.setPadding(mSelectionMode ? dp(32) : 0, 0, holder.favorite.getVisibility() == View.VISIBLE ? dp(24) : 0, 0);
       holder.selection.setVisibility(mSelectionMode ? View.VISIBLE : View.GONE);
       holder.selection.setText(selected ? "✓" : "");
       holder.selection.setBackground(selectionCircle(selected));
@@ -332,22 +358,40 @@ public final class AdvancedLtClipboardView extends FrameLayout implements MainCh
           : AdvancedLtTheme.text(getContext()));
       holder.itemView.setBackground(AdvancedLtTheme.rounded(getContext(), selected));
       holder.itemView.setOnClickListener(
-          ignored -> onEntryClicked(holder.getBindingAdapterPosition()));
+          ignored -> {
+            final int row = holder.getBindingAdapterPosition();
+            if (row != RecyclerView.NO_POSITION) onEntryClicked(mVisiblePositions.get(row));
+          });
+      holder.itemView.setOnLongClickListener(ignored -> {
+        final int row = holder.getBindingAdapterPosition();
+        if (mSelectionMode || row == RecyclerView.NO_POSITION) return false;
+        final boolean favorite = listener().toggleFavorite(mVisiblePositions.get(row));
+        holder.favorite.animate().cancel();
+        holder.favorite.setVisibility(View.VISIBLE);
+        holder.favorite.setAlpha(favorite ? 0f : 1f);
+        if (favorite) holder.text.setPadding(0, 0, dp(24), 0);
+        holder.favorite.animate().alpha(favorite ? 1f : 0f).setDuration(150).withEndAction(() -> {
+          if (!favorite) refreshVisibleEntries();
+        }).start();
+        return true;
+      });
     }
 
     @Override
     public int getItemCount() {
-      return mEntries.size();
+      return mVisiblePositions.size();
     }
   }
 
   private static final class ClipboardViewHolder extends RecyclerView.ViewHolder {
     private final TextView text;
     private final TextView selection;
+    private final ImageView favorite;
 
     ClipboardViewHolder(@NonNull View itemView) {
       super(itemView);
       text = itemView.findViewById(R.id.advanced_lt_clipboard_item_text);
+      favorite = itemView.findViewById(R.id.advanced_lt_clipboard_item_favorite);
       selection = itemView.findViewById(R.id.advanced_lt_clipboard_item_selection);
     }
   }

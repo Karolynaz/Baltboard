@@ -52,6 +52,15 @@
                     android:textSize="19sp" />
 
                 <ImageButton
+                    android:id="@+id/advanced_lt_clipboard_favorites"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/advanced_lt_clipboard_favorites"
+                    android:scaleType="center"
+                    android:src="@drawable/advanced_lt_bookmark_outline" />
+
+                <ImageButton
                     android:id="@+id/advanced_lt_clipboard_start_delete"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
